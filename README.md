@@ -1,5 +1,5 @@
 ## TIDY 
-#### a efficient tool helps organizing your files !
+### a efficient tool helps organizing your files !
 #### feature
 1. sort by time
 2. sort by file type

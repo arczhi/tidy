@@ -6,9 +6,10 @@ import (
 	"math"
 	"sort"
 	"sync"
-	"tidy/pkg/core"
-	"tidy/pkg/tool"
 	"time"
+
+	"github.com/arczhi/tidy/pkg/core"
+	"github.com/arczhi/tidy/pkg/tool"
 )
 
 type Sorter struct {

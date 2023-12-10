@@ -5,9 +5,10 @@ import (
 	"io/fs"
 	"os"
 	"sync"
-	"tidy/pkg/constants"
-	"tidy/pkg/core"
-	"tidy/pkg/tool"
+
+	"github.com/arczhi/tidy/pkg/constants"
+	"github.com/arczhi/tidy/pkg/core"
+	"github.com/arczhi/tidy/pkg/tool"
 )
 
 type Exporter struct {

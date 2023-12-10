@@ -3,11 +3,13 @@ package impl
 import (
 	"errors"
 	"os"
-	exporter_impl "tidy/impl/exporter"
-	scanner_impl "tidy/impl/scanner"
-	sorter_impl "tidy/impl/sorter"
-	"tidy/pkg/core"
-	"tidy/pkg/tool"
+
+	exporter_impl "github.com/arczhi/tidy/impl/exporter"
+	scanner_impl "github.com/arczhi/tidy/impl/scanner"
+	sorter_impl "github.com/arczhi/tidy/impl/sorter"
+
+	"github.com/arczhi/tidy/pkg/core"
+	"github.com/arczhi/tidy/pkg/tool"
 )
 
 var scanner core.Scanner = &scanner_impl.Scanner{}
