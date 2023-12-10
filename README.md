@@ -24,8 +24,38 @@
 2. code
 
    ```
+   package main
+   
+   import (
+   	"time"
+   
+   	tidy "github.com/arczhi/tidy/impl"
+   	core "github.com/arczhi/tidy/pkg/core"
+   )
+   
+   func main() {
+   
+   	// sort by time
+   	t, err := tidy.New("./your/directory", core.WithTimeSpan(time.Duration(6)*time.Hour))
+   	if err != nil {
+   		panic(err)
+   	}
+   	if err := t.Exec(); err != nil {
+   		panic(err)
+   	}
+   
+   	//sort by file type
+   	t2, err := tidy.New("./your/directory", core.WithFileType())
+   	if err != nil {
+   		panic(err)
+   	}
+   	if err := t2.Exec(); err != nil {
+   		panic(err)
+   	}
+   }
+   
    ```
-
+   
    
 
 #### example

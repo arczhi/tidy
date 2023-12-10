@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 	"runtime/debug"
-	"tidy/impl"
-	"tidy/pkg/constants"
-	"tidy/pkg/core"
-	"tidy/pkg/tool"
 	"time"
+
+	"github.com/arczhi/tidy/impl"
+	"github.com/arczhi/tidy/pkg/constants"
+	"github.com/arczhi/tidy/pkg/core"
+	"github.com/arczhi/tidy/pkg/tool"
 )
 
 var (
