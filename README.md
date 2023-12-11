@@ -10,13 +10,13 @@
    ```
    tidy -h
    
-   Usage of tidy:
+   Usage of tidy.exe:
      -dir string
            please give new a directory name (default "new_directory")
      -path string
            please give your directory path
      -time_span string
-           give a time span, for example: 1d,1h,30min,30s
+           give a time span, for example: year,month,day,hour,minute,second (default "hour")
      -type string
            time: sort by time      file_type: sort by file_type (default "time")
    ```
@@ -30,13 +30,14 @@
    	"time"
    
    	tidy "github.com/arczhi/tidy/impl"
-   	core "github.com/arczhi/tidy/pkg/core"
+   	"github.com/arczhi/tidy/pkg/core"
+   	"github.com/arczhi/tidy/pkg/constants"
    )
    
    func main() {
    
    	// sort by time
-   	t, err := tidy.New("./your/directory", core.WithTimeSpan(time.Duration(6)*time.Hour))
+   	t, err := tidy.New("./your/directory", core.WithTimeSpan(constants.TIME_FORMAT_ACCURATE_TO_HOUR)
    	if err != nil {
    		panic(err)
    	}
@@ -44,7 +45,7 @@
    		panic(err)
    	}
    
-   	//sort by file type
+   	// sort by file type
    	t2, err := tidy.New("./your/directory", core.WithFileType())
    	if err != nil {
    		panic(err)
@@ -62,6 +63,8 @@
 
 ![image-20231210225435370](README.assets/image-20231210225435370.png)
 
-![image-20231210225520065](README.assets/image-20231210225520065.png)
+![image-20231211223020720](README.assets/image-20231211223020720.png)
+
+![image-20231211223130372](README.assets/image-20231211223130372.png)
 
 ![image-20231210225551409](README.assets/image-20231210225551409.png)

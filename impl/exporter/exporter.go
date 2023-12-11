@@ -5,10 +5,13 @@ import (
 	"io/fs"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/arczhi/tidy/pkg/constants"
 	"github.com/arczhi/tidy/pkg/core"
 	"github.com/arczhi/tidy/pkg/tool"
+
+	"github.com/arczhi/tidy/pkg/tool/file_time"
 )
 
 type Exporter struct {
@@ -21,15 +24,20 @@ func (e *Exporter) SetUp(setting *core.Setting) {
 
 func (e *Exporter) Export() error {
 	var (
-		wg           sync.WaitGroup
-		errorChan    = make(chan error, tool.GetDirEntryNum(e.setting.SortedEntries))
-		subDirectory string
+		wg                                    sync.WaitGroup
+		errorChan                             = make(chan error, constants.ERROR_CHAN_NUM)
+		subDirectory                          string
+		createdTime, accessTime, modifiedTime time.Time
 	)
 
-	for index, entries := range *e.setting.SortedEntries {
+	// SortedEntries key
+	// sort_by_time, for example: "2006-01-02 15.04.05" / "2006-01-02 15.04" / "2006-01-02 15"
+	// sort_by_file_type, for example: "docx" / "doc" / "pptx"
+	for key, entries := range e.setting.SortedEntries {
+		// fmt.Println("测试", key)
 		for _, entry := range entries {
 			wg.Add(1)
-			go func(index int, entry fs.DirEntry) {
+			go func(key string, entry fs.DirEntry) {
 				defer wg.Done()
 
 				path := e.setting.ImportPath + "/" + entry.Name()
@@ -40,16 +48,16 @@ func (e *Exporter) Export() error {
 				}
 				defer file.Close()
 
-				if e.setting.SortOptions.ByTimeSpan().Seconds() > 0 {
+				fileInfo, err := entry.Info()
+				if err != nil {
+					errorChan <- err
+					return
+				}
 
-					firstFileInfo, err := (*e.setting.SortedEntries)[index][0].Info()
-					if err != nil {
-						errorChan <- err
-						return
-					}
-					subDirectory = firstFileInfo.ModTime().Format(constants.TIME_FORMAT)
-				} else if e.setting.SortOptions.ByFileType() {
-					subDirectory = tool.GetFileType(path)
+				if e.setting.SortOptions.SortByTimeSpan() {
+					subDirectory = fileInfo.ModTime().Format(e.setting.SortOptions.TimeFormat())
+				} else if e.setting.SortOptions.SortByFileType() {
+					subDirectory = key
 				}
 
 				newFilePath := tool.NewFilePath(e.setting.ImportPath, core.DirectoryNameParam, subDirectory, tool.GetFileName(entry.Name()))
@@ -66,14 +74,19 @@ func (e *Exporter) Export() error {
 				}
 				newFile.Write(data)
 
-				createdTime, accessTime, modifiedTime := tool.GetFileTime(e.setting.ImportPath + "/" + entry.Name())
-				err = tool.SetFileTime(newFilePath, createdTime, accessTime, modifiedTime)
+				if tool.OsType == constants.OS_WINDOWS {
+					createdTime, accessTime, modifiedTime = file_time.GetFileTime(e.setting.ImportPath + "/" + entry.Name())
+				} else if tool.OsType == constants.OS_LINUX || tool.OsType == constants.OS_DARWIN {
+					createdTime, accessTime, modifiedTime = file_time.GetFileTime(e.setting.ImportPath + "/" + entry.Name())
+					// createdTime, accessTime, modifiedTime = fileInfo.ModTime(), fileInfo.ModTime(), fileInfo.ModTime()
+				}
+				err = file_time.SetFileTime(newFilePath, createdTime, accessTime, modifiedTime)
 				if err != nil {
 					errorChan <- err
 					return
 				}
 
-			}(index, entry)
+			}(key, *entry)
 		}
 	}
 

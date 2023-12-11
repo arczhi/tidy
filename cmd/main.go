@@ -9,7 +9,6 @@ import (
 	"github.com/arczhi/tidy/impl"
 	"github.com/arczhi/tidy/pkg/constants"
 	"github.com/arczhi/tidy/pkg/core"
-	"github.com/arczhi/tidy/pkg/tool"
 )
 
 var (
@@ -30,17 +29,7 @@ func main() {
 			return
 		}
 	} else if core.SortTypeParam == constants.SORT_BY_TIME {
-		var timeSpan time.Duration
-		if core.TimeSpanParam == "" {
-			timeSpan = 6 * time.Hour
-		} else {
-			timeSpan, err = tool.ParseTimeSpan(core.TimeSpanParam)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-		}
-		tidy, err = impl.New(path, core.WithTimeSpan(timeSpan))
+		tidy, err = impl.New(path, core.WithTimeSpan(core.TimeSpanParam))
 		if err != nil {
 			log.Println(err)
 			return

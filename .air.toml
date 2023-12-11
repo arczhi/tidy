@@ -5,7 +5,7 @@ tmp_dir = "bin"
 [build]
   args_bin = []
   bin = "bin\\tidy.exe"
-  cmd = "go env -w GOOS=windows & go build -o ./bin/tidy.exe ./cmd & go env -w GOOS=linux & go build -o ./bin/tidy ./cmd"
+  cmd = "go env -w GOOS=windows ; go build -tags 'windows' -o ./bin/tidy.exe ./cmd"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []

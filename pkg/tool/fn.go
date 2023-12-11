@@ -7,11 +7,15 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
+
+	"github.com/arczhi/tidy/pkg/constants"
 )
 
-var OsType = runtime.GOOS
+var (
+	OsType      = runtime.GOOS
+	currentPath string
+)
 
 func CheckPath(path string) (string, error) {
 	if len(path) > 0 {
@@ -71,31 +75,12 @@ func ExtendDirEntries(entries *[][]fs.DirEntry, index int) {
 	}
 }
 
-func GetDirEntryNum(entries *[][]fs.DirEntry) int {
+func GetDirEntryNum(entries map[string][]*fs.DirEntry) int {
 	var num int
-	for _, entryList := range *entries {
+	for _, entryList := range entries {
 		num += len(entryList)
 	}
 	return num
-}
-
-func SetFileTime(path string, createdTime time.Time, accessTime time.Time, modifiedTime time.Time) error {
-
-	pathPtr, err := syscall.UTF16PtrFromString(path)
-	if err != nil {
-		return nil
-	}
-	handle, err := syscall.CreateFile(pathPtr, syscall.FILE_WRITE_ATTRIBUTES, syscall.FILE_SHARE_WRITE, nil, syscall.OPEN_EXISTING, syscall.FILE_FLAG_BACKUP_SEMANTICS, 0)
-	if err != nil {
-		return nil
-	}
-	defer syscall.Close(handle)
-	c := syscall.NsecToFiletime(syscall.TimespecToNsec(syscall.NsecToTimespec(createdTime.UnixNano())))
-	a := syscall.NsecToFiletime(syscall.TimespecToNsec(syscall.NsecToTimespec(accessTime.UnixNano())))
-	m := syscall.NsecToFiletime(syscall.TimespecToNsec(syscall.NsecToTimespec(modifiedTime.UnixNano())))
-	syscall.SetFileTime(handle, &c, &a, &m)
-
-	return nil
 }
 
 func ParseTimeSpan(timeSpan string) (time.Duration, error) {
@@ -134,4 +119,21 @@ func ParseTimeSpan(timeSpan string) (time.Duration, error) {
 
 	return time.Duration(num) * timeUnit, nil
 
+}
+
+func IsBinary(name string) bool {
+	if name == constants.BINARY_NAME_IN_LINUX || name == constants.BINARY_NAME_IN_WINDOWS {
+		return true
+	}
+	return false
+}
+
+func IsBinaryInPath(path string) bool {
+	if currentPath == "" {
+		currentPath, _ = os.Getwd()
+	}
+	if path == "" || path == currentPath {
+		return true
+	}
+	return false
 }

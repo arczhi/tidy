@@ -15,7 +15,7 @@ type Scanner interface {
 
 type Sorter interface {
 	SetUp(dirEntries *[]fs.DirEntry, options ...SortOpt)
-	Sort() (*[][]fs.DirEntry, error)
+	Sort() (map[string][]*fs.DirEntry, error)
 }
 
 type Exporter interface {
